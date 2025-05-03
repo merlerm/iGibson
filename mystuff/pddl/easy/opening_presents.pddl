@@ -5,12 +5,9 @@
      	package_1 package_2 - container
     	floor_1 - object
     	bed_1 - object
-    	agent_1 - agent
     )
     
     (:init 
-        (openable package_1)
-        (openable package_2)
         (not (open package_1)) 
         (not (open package_2)) 
     )

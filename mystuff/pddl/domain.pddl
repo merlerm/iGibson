@@ -2,86 +2,100 @@
     (:requirements :strips :typing :negative-preconditions :conditional-effects :equality :disjunctive-preconditions)
 
     (:types
-        agent receptacle - object
-        container - receptacle ;; A container is a type of receptacle that can be opened and closed
+        container movable - object
+        sliceable slicer - movable
     )
 
     (:predicates
 
         ;; Agent predicates
-        (reachable ?o - object ?a - agent)
-        (holding ?a - agent ?o - object)
+        (reachable ?o - object)
+        (holding ?m - movable)
 
         ;; Object attributes
-        (movable ?o - object)
-        (openable ?o - object) ;; equivalent to is-container
         (open ?c - container)
 
         ;; Object relations
-        (ontop ?o1 - object ?o2 - object)
-        (inside ?o - object ?r - object)
+        (ontop ?o1 - object ?o2 - object) ;; no assumptions on the types of objects that can be on top or below others
+        (inside ?o - object ?c - container) ;; only containers can contain objects
+        (nextto ?o1 - object ?o2 - object) ;; no assumptions on the types of objects that can be next to each other
 
         ;; Specific object attributes
-        (slicer ?o - object) ;; (e.g. knife)
-        (sliced ?o - object) ;; (e.g. sliced tomato)
+        (sliced ?s - sliceable) ;; (e.g. sliced tomato)
     )
 
     (:action grasp
-        :parameters (?a - agent ?o - object)
+        :parameters (?m - movable)
         :precondition (and
-            (reachable ?o ?a)
-            (movable ?o)
+            (reachable ?m)
             (forall
-                (?x - object)
-                (not (holding ?a ?x))) ;; Agent must not be holding anything
-            (forall
-                (?x - object)
-                (not (ontop ?x ?o))) ;; Can't grasp an objectect that has something on top of it
+                (?x - movable)
+                (not (holding ?x))) ;; Agent must not be holding anything
+            ;;(forall
+            ;;    (?x - movable)
+            ;;    (not (ontop ?x ?m))) ;; Can't grasp an object that has something on top of it
         )
         :effect (and
-            (holding ?a ?o)
-            (not (reachable ?o ?a))
+            (holding ?m)
+            ;;(not (reachable ?m)) ;; not sure if necessary
             (forall
                 (?y - object)
-                (not (ontop ?o ?y))) ;; If grasped objectect is on top of something, it is no longer on top of it
+                (and
+                    (not (ontop ?m ?y)) ;; If grasped object is on top of something, it is no longer on top of it
+                    (not (nextto ?m ?y)))) ;; Same for next to
             (forall
-                (?r - receptacle)
+                (?c - container)
                 (when
-                    (inside ?o ?r)
-                    (not (inside ?o ?r)))) ;; If o was in a receptacle, it's not anymore
+                    (inside ?m ?c)
+                    (not (inside ?m ?c)))) ;; If m was in a container, it's not anymore
         )
     )
 
     (:action place-on
-        :parameters (?a - agent ?o1 - object ?o2 - object)
+        :parameters (?m - movable ?o2 - object)
         :precondition (and
-            (holding ?a ?o1)
-            (reachable ?o2 ?a)
+            (holding ?m)
+            (reachable ?o2)
         )
         :effect (and
-            (ontop ?o1 ?o2)
-            (not (holding ?a ?o1))
+            (ontop ?m ?o2)
+            (not (holding ?m))
+        )
+    )
+
+    (:action place-next-to
+        :parameters (?m - movable ?o2 - object)
+        :precondition (and
+            (holding ?m)
+            (reachable ?o2)
+        )
+        :effect (and
+            (nextto ?m ?o2) ;; this will break if we need an object to be both nextto an object inside a container and inside the container itself
+            (not (holding ?m))
         )
     )
 
     (:action place-inside
-        :parameters (?a - agent ?o - object ?r - receptacle)
+        :parameters (?m - movable ?c - container)
         :precondition (and
-            (holding ?a ?o)
-            (reachable ?r ?a)
+            (holding ?m)
+            (reachable ?c)
+            (open ?c)
         )
         :effect (and
-            (inside ?o ?r)
-            (not (holding ?a ?o))
+            (inside ?m ?c)
+            (not (holding ?m))
         )
     )
 
     (:action open-container
-        :parameters (?a - agent ?c - container)
+        :parameters (?c - container)
         :precondition (and
-            (openable ?c)
-            (reachable ?c ?a)
+            (reachable ?c)
             (not (open ?c))
+            (forall
+                (?x - movable)
+                (not (holding ?x))) ;; Agent must not be holding anything
         )
         :effect (and
             (open ?c)
@@ -89,15 +103,14 @@
                 (?o - object)
                 (when
                     (inside ?o ?c)
-                    (reachable ?o ?a))) ;; All objects inside the container are reachable
+                    (reachable ?o))) ;; All objects inside the container are reachable
         )
     )
 
     (:action close-container
-        :parameters (?a - agent ?c - container)
+        :parameters (?c - container)
         :precondition (and
-            (openable ?c)
-            (reachable ?c ?a)
+            (reachable ?c)
             (open ?c)
         )
         :effect (and
@@ -106,59 +119,61 @@
                 (?o - object)
                 (when
                     (inside ?o ?c)
-                    (not (reachable ?o ?a)))) ;; All objects inside the container are unreachable
+                    (not (reachable ?o)))) ;; All objects inside the container are unreachable
         )
     )
 
     (:action navigate-to
-        :parameters (?a - agent ?o - object)
-        :precondition (not (reachable ?o ?a))
+        :parameters (?o - object)
+        :precondition (and
+                        (not (reachable ?o))
+                        ;; don’t navigate-to things hidden in a closed container
+                        (not (exists (?c - container)
+                                (and (inside ?o ?c) 
+                                     (not (open ?c)))
+                             )
+                        )
+                      )
         :effect (and
-            ;; Make all other objects unreachable.
-            (forall
-                (?x - object)
+            (reachable ?o) ;; make target object reachable
+
+            ;; Make every other object unreachable - ok
+            (forall (?x - object)
                 (when
-                    (not (= ?x ?o))
-                    (not (reachable ?x ?a))))
-            ;; If ?o is inside a closed container, mark that container reachable instead
-            (when
-                (exists
-                    (?c - container)
-                    (and (inside ?o ?c) (not (open ?c))))
-                (forall
-                    (?c - container)
-                    (when
-                        (and (inside ?o ?c) (not (open ?c)))
-                        (and (reachable ?c ?a) (not (reachable ?o ?a))))))
-            ;; Otherwise, mark ?o reachable.
-            (when
-                (forall
-                    (?c - container)
-                    (or (not (inside ?o ?c)) (open ?c)))
-                (reachable ?o ?a))
-            ;; If ?o is not openable and has something inside (a receptacle), mark those objects as reachable.
-            (when
+                    (not (= ?x ?o)) ;; condition
+                    (not (reachable ?x)))) ;; effect
+
+            ;; Also, if there exists a container which is ?o and that it's open,
+            ;; set the objects inside as reachable
+            (forall (?c - container ?x - object)
+              (when 
                 (and
-                    (not (openable ?o))
-                    (exists
-                        (?x - object)
-                        (inside ?x ?o)))
-                (forall
-                    (?x - object)
-                    (when
-                        (inside ?x ?o)
-                        (reachable ?x ?a))))
+                  (= ?c ?o)
+                  (open ?c)
+                  (inside ?x ?c)
+                )
+                (reachable ?x)))
+
+            ;; If ?o is inside a container (which is open because of the preconditions), 
+            ;; mark the container and all the objects inside as reachable
+            ;;(forall (?c - container ?x - object)
+            ;;  (when
+            ;;    (and
+            ;;      ;;(open ?c) ;; should be already true due to preconditions
+            ;;      (inside ?o ?c)
+            ;;      (inside ?x ?c))
+            ;;    (and
+            ;;      (reachable ?c)
+            ;;      (reachable ?x))))
+
         )
     )
 
     (:action slice
-        :parameters (?a - agent ?o - object)
+        :parameters (?o - sliceable ?s - slicer)
         :precondition (and
-            (exists (?s - object) 
-                (and 
-                    (holding ?a ?s)
-                    (slicer ?s)))
-            (reachable ?o ?a)
+            (holding ?s)
+            (reachable ?o)
             (not (sliced ?o))
         )
         :effect (and 

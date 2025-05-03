@@ -3,12 +3,9 @@
 
   (:objects
     package_1 package_2 - container
-    agent_1 - agent
   )
 
   (:init
-    (openable package_1)
-    (openable package_2)
     (not (open package_1))
     (not (open package_2))
   )

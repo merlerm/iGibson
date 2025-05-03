@@ -3,12 +3,9 @@
 
     (:objects
      	door_1 door_2 - container
-    	agent_1 - agent
     )
     
     (:init 
-        (openable door_1) 
-        (openable door_2) 
         (open door_1) 
         (open door_2) 
     )

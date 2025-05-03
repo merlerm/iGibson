@@ -22,9 +22,9 @@
     
     (:goal 
         (and 
-            (ontop piece_of_cloth_1 sink_1) 
-            (ontop bowl_1 sink_1) 
-            (ontop bowl_2 sink_1) 
+            (nextto piece_of_cloth_1 sink_1) 
+            (nextto bowl_1 sink_1) 
+            (nextto bowl_2 sink_1) 
             (ontop spoon_1 sink_1) 
             (ontop spoon_2 sink_1)
         )

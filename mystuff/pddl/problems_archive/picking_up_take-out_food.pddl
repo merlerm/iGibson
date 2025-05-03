@@ -3,16 +3,14 @@
 
     (:objects
     	floor_1 - object
-    	carton_1 - container
+    	carton_1 - container ;; this one breaks
         table_1 - object
-        sushi_1 - object
-        hamburger_1 - object
-    	agent_1 - agent
+        sushi_1 - movable
+        hamburger_1 - movable
     )
     
     (:init 
         (ontop carton_1 floor_1) 
-        (movable carton_1)
         (inside sushi_1 carton_1) 
         (inside hamburger_1 carton_1) 
     )

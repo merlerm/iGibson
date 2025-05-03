@@ -3,14 +3,9 @@
 
     (:objects
      	window_1 window_2 window_3 window_4 - container
-    	agent_1 - agent
     )
     
     (:init 
-        (openable window_1) 
-        (openable window_2) 
-        (openable window_3) 
-        (openable window_4) 
         (open window_1) 
         (open window_2) 
         (open window_3) 
