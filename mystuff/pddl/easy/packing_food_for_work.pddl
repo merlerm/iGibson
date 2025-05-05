@@ -14,7 +14,7 @@
     )
     
     (:init 
-        (not (open carton_1))
+        (open carton_1)
         (not (open cabinet_1))
         (not (open electric_refrigerator_1))
 
@@ -32,7 +32,7 @@
             (inside sandwich_1 carton_1) 
             (inside apple_1 carton_1) 
             (inside snack_food_1 carton_1) 
-            (inside juice_1 carton_1) 
+            ;;(inside juice_1 carton_1) 
         )
     )
 )
