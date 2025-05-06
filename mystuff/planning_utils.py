@@ -1,5 +1,6 @@
 import os
 import json
+from PIL import ImageDraw
 
 def execute_plan(sim_env, plan, task, task_instance):
     # Create image directory

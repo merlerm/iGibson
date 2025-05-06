@@ -1,5 +1,5 @@
 {
-  "plan_succeeded": true,
+  "plan_succeeded": false,
   "plan_status": {
     "plan": [
       {
@@ -15,33 +15,112 @@
         ]
       },
       {
-        "action": "grasp",
+        "action": "close-container",
         "params": [
-          "bowl_1"
+          "cabinet_1"
         ]
       },
       {
         "action": "navigate-to",
         "params": [
-          "sink_1"
+          "cabinet_1"
         ]
       },
       {
-        "action": "place-on",
+        "action": "open-container",
         "params": [
-          "bowl_1",
-          "sink_1"
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "close-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "navigate-to",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "open-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "close-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "navigate-to",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "open-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "close-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "navigate-to",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "open-container",
+        "params": [
+          "cabinet_1"
+        ]
+      },
+      {
+        "action": "close-container",
+        "params": [
+          "cabinet_1"
         ]
       }
     ],
     "successes": [
       true,
+      false,
+      false,
       true,
+      false,
+      false,
       true,
+      false,
+      false,
       true,
-      true
+      false,
+      false,
+      true,
+      false,
+      false
     ],
     "legals": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
       true,
       true,
       true,
