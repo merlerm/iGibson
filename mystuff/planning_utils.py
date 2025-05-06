@@ -42,13 +42,23 @@ def execute_plan(sim_env, plan, task, task_instance):
             print(f"Action {action} illegal: {e}")
             success = False
             legal = False
-
+            
             plan_status['successes'].append(success)
             plan_status['legals'].append(legal)
             break
 
         except AssertionError as e:
             print(f"Action {action} failed: {e}")
+            
+            image, symbolic_state = sim_env.get_state_and_image()
+            image_path = os.path.join(image_dir, f'step_{image_idx}.png')
+            image.save(image_path)
+            image_idx += 1
+
+            # Why the image doesn't get shown??
+            image.show()
+            print_symbolic_state(symbolic_state)
+            
             success = False
             legal = True
 
