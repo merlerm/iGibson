@@ -24,7 +24,7 @@ def execute_plan(sim_env, plan, task, task_instance):
     for action in plan:
         try:
             legal, info, image, symbolic_state = sim_env.apply_action(action)
-            print(f'Action {action} executed. Legal: {legal} - Success: {success}')
+            print(f'Action {action} executed. Legal: {legal} - Info: {info}')
 
             # Save image after action
             image_path = os.path.join(image_dir, f'step_{image_idx}.png')
@@ -34,6 +34,7 @@ def execute_plan(sim_env, plan, task, task_instance):
             image.show()
             print_symbolic_state(symbolic_state)
 
+            success = True if 'success' in info else False
             plan_status['successes'].append(success)
             plan_status['legals'].append(legal)
 
